@@ -17,24 +17,33 @@
             
             <section class="items">
                 <h4>Pick your items</h4>
-                <div v-for="product in products" class="product">
+                <div 
+                    v-for="product in products"
+                    :key="product.name" 
+                    class="product"
+                    @click="product.active = !product.active"
+                    :class="{ selected : product.active }"    
+                > 
+                <!-- :key = pk do item da lista
+                    caso o item de uma lista seja alterado, o Vue irá identificar qual item foi alterado através do :key e atualizar apenas esse item, ao invés de atualizar toda a lista, o que melhora a performance da aplicação.
+                -->
                     <div class="photo">
                         <img :src="product.photo">
                     </div>
                     <div class="description">
                         <span class="name">{{product.name}}</span>
                         <span class="price">{{product.price}}</span>
-                        <div class="quantity-area">
-                            <button>-</button>
+                        <div class="quantity-area" v-if="product.active"> 
+                            <button @click.stop="product.quantity--" :disabled="product.quantity<=1">-</button> <!-- .stop = o evento de click não se propaga para o elemento pai  -->
                             <span class="quantity">{{product.quantity}}</span>
-                            <button>+</button>
+                            <button @click.stop="product.quantity++">+</button>
                         </div>
                     </div>
                 </div>
                 
             </section>
 
-            <section class="summary">
+            <section class="summary" v-if="total > 0">
                 <strong>Resumo do pedido</strong>
                 <table>
                     <thead>
@@ -44,14 +53,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1x Big Mac</td>
-                            <td>5.99</td>
+                        <tr v-for="product in products" :key="'summary-' + product.name">
+                            <template v-if="product.active">
+                                <td>{{product.quantity + 'x ' + product.name}}</td>
+                                <td>{{(product.price * product.quantity).toFixed(2)}}</td>
+                            </template>
                         </tr>
                         
                         <tr>
                             <th>Total</th>
-                            <th>5.99</th>
+                            <th>{{ total }}</th>
                         </tr>
                     </tbody>
                 </table>

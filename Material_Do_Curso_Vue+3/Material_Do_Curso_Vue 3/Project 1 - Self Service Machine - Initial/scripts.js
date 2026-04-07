@@ -63,12 +63,20 @@ var products = [
         "quantity": 1
     },
 ];
- 
+
 const SelfServiceMachine = {
     data() {
         return {
             products: window.products,
         };
+    },
+    computed: {
+        total(){
+            return this.products
+                .filter(p => p.active)
+                .reduce((sum, p) => sum + p.price * p.quantity, 0)
+                .toFixed(2)
+        }
     }
 };
 
